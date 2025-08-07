@@ -90,12 +90,13 @@ install_base_tools() {
   install_peass
 }
 
-# VENV, rockyou, PEASS suite\ nVENV_DIR="$HOME/.catana_venv"
+# VENV, rockyou, PEASS suite
+VENV_DIR="$HOME/.catana_venv"
 ensure_venv() {
   echo -e "
 ==> Setting up Python venv"
   check_and_install python3 Python3 apt install -y python3
-  check_and_install python3 python3-venv apt install -y python3-venv
+  check_and_install python3-venv python3-venv apt install -y python3-venv
   if [ ! -d "$VENV_DIR" ]; then
     run "Creating Python virtualenv" python3 -m venv "$VENV_DIR"
     run "Upgrading pip in venv" bash -c "source '$VENV_DIR/bin/activate' && pip install --upgrade pip"
@@ -153,7 +154,7 @@ fix_golang_env() {
 install_impacket() {
   echo -e "
 ==> Installing Impacket"
-  if python3 - << 'PYCODE' &> /dev/null; python
+  if python3 - << 'PYCODE' &> /dev/null; then
 import impacket
 PYCODE
     echo -e "
@@ -265,7 +266,7 @@ L) Install Enum4inux
 Q) Quit
 MENU
   read -rp "Enter choice: " choice
-  case "$choice" in
+  case "\$choice" in
     1) update_system ;;
     2) upgrade_system ;;
     3) install_base_tools ;;
