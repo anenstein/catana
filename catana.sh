@@ -160,7 +160,7 @@ ASCII
 --------------------
 1) Update package list
 2) Upgrade installed packages
-3) Install base red-team tools & env
+3) Install base env
 4) Fix Samba config
 5) Fix Golang env
 6) Install Impacket
