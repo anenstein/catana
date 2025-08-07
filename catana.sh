@@ -286,4 +286,6 @@ MENU
     [Qq]) echo "Goodbye!"; exit 0 ;;
     *) echo "Invalid choice."; sleep 1 ;;
   esac
+  # Pause so user can read output before menu refresh
+  read -rp "Press Enter to return to menu..." dummy
 done
