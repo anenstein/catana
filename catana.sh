@@ -223,7 +223,6 @@ ASCII
 4) Fix Samba config
 5) Fix Golang env
 6) Install Impacket
-7) Enable Root Login
 8) Install Docker/Compose
 9) Update Nmap scripts
 A) Install Proxychains
@@ -247,9 +246,8 @@ MENU
     4) fix_samba ;;
     5) fix_golang_env ;;
     6) install_impacket ;;
-    7) enable_root_login ;;
-    8) fix_docker_compose ;;
-    9) fix_nmap_scripts ;;
+    7) fix_docker_compose ;;
+    8) fix_nmap_scripts ;;
     [Aa]) install_proxychains ;;
     [Bb]) install_filezilla ;;
     [Cc]) install_rlwrap ;;
