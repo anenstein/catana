@@ -16,6 +16,7 @@ if [[ "$(basename "$0")" != "catana" ]]; then
   cp "$0" /usr/local/bin/catana
   chmod +x /usr/local/bin/catana
   exec /usr/local/bin/catana "$@"
+  sudo ln -sf ~/catana/catana.sh /usr/local/bin/catana
 fi
 
 # Utility: run a command with two-stage progress bar via dialog
