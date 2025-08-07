@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-# Ensure we're root
+# catana: Infrastructure Red Team Bootstrapper for Kali Linux
+# ----------------------------------------------------------
+# Dependencies: dialog is required for the interactive menu.
+# This script updates/upgrades the OS, installs dialog if missing,
+# then self-installs itself into /usr/local/bin/catana, sets an alias,
+# and launches the menu.
+
+# Ensure we’re root
 if [ "$EUID" -ne 0 ]; then
   echo "Please run as root or via sudo."
   exit 1
@@ -8,7 +15,7 @@ fi
 # Install 'dialog' if missing
 if ! command -v dialog &> /dev/null; then
   echo "Installing 'dialog' dependency..."
-  apt update -y && apt install -y dialog
+  apt update && apt install -y dialog
 fi
 
 # Self-install into /usr/local/bin/catana
@@ -27,11 +34,6 @@ if ! grep -q "alias catana=" "$BASHRC"; then
   echo "alias catana='bash $SCRIPT_PATH'" >> "$BASHRC"
   source "$BASHRC"
 fi
-# catana: Infrastructure Red Team Bootstrapper for Kali Linux
-# ----------------------------------------------------------
-# This script updates/upgrades the OS, then installs or fixes
-# various tools via an interactive menu. It's idempotent, shows
-# progress, supports a Python virtualenv, and is easy to extend.
 
 #-----------------------------------------
 # ASCII HEADER
@@ -44,7 +46,7 @@ cat << 'EOF'
 | (_| (_| | || (_| | | | | (_| |
  \___\__,_|\__\__,_|_| |_|\__,_|
                                 
-                                 
+                                
 EOF
 
 #-----------------------------------------
@@ -113,7 +115,7 @@ function install_peass_suite() {
 # FIX/INSTALL FUNCTIONS
 #-----------------------------------------
 function fix_missing_tools() {
-  run_with_progress "apt update & upgrade" bash -c "apt update -y && apt upgrade -y"
+  run_with_progress "apt update & upgrade" bash -c "apt update && apt upgrade -y"
   check_and_install gedit "Gedit editor" apt install -y gedit
   check_and_install nmap "Nmap" apt install -y nmap
   check_and_install build-essential "build-essential" apt install -y build-essential
@@ -125,7 +127,7 @@ function fix_missing_tools() {
 
 function fix_samba() {
   run_with_progress "Configuring Samba protocols" bash -c \
-    "sed -i '/client min protocol/!c\\\tclient min protocol = SMB2\nclient max protocol = SMB3' /etc/samba/smb.conf || true"
+    "sed -i '/client min protocol/!c\\tclient min protocol = SMB2\nclient max protocol = SMB3' /etc/samba/smb.conf || true"
 }
 
 function fix_golang_env() {
@@ -216,6 +218,7 @@ function show_menu() {
     F "Install Feroxbuster" \
     G "Install Ncat" \
     H "Install Remmina" \
+
     I "Install xfreerdp" \
     J "Setup BloodHound" \
     M "Install Enum4linux" \
@@ -223,11 +226,20 @@ function show_menu() {
     O "Install WinPEAS" \
     K "Install ALL selected" \
     X "Quit" 2> /tmp/catana.choice
+
   CHOICE=$(< /tmp/catana.choice)
 }
 
 function install_all() {
-  ALL_FUNCS=(fix_missing_tools fix_samba fix_golang_env install_impacket enable_root_login fix_docker_compose fix_nmap_scripts run_upgrade_tools install_proxychains install_filezilla install_rlwrap install_nuclei install_subfinder install_feroxbuster install_ncat install_remmina install_xfreerdp install_bloodhound install_enum4linux install_linpeas install_winpeas)
+  ALL_FUNCS=(
+    fix_missing_tools fix_samba fix_golang_env install_impacket
+    enable_root_login fix_docker_compose fix_nmap_scripts
+    run_upgrade_tools install_proxychains install_filezilla
+    install_rlwrap install_nuclei install_subfinder
+    install_feroxbuster install_ncat install_remmina
+    install_xfreerdp install_bloodhound install_enum4linux
+    install_linpeas install_winpeas
+  )
   TOTAL_STEPS=${#ALL_FUNCS[@]}
   CURRENT_STEP=0
   for f in "${ALL_FUNCS[@]}"; do
@@ -246,7 +258,8 @@ while true; do
     A) install_proxychains ;; B) install_filezilla ;; C) install_rlwrap ;;
     D) install_nuclei ;; E) install_subfinder ;; F) install_feroxbuster ;;
     G) install_ncat ;; H) install_remmina ;; I) install_xfreerdp ;;
-    J) install_bloodhound ;; M) install_enum4linux ;; N) install_linpeas ;; O) install_winpeas ;; K) install_all ;; X) clear; exit 0 ;;
+    J) install_bloodhound ;; M) install_enum4linux ;; N) install_linpeas ;;
+    O) install_winpeas ;; K) install_all ;; X) clear; exit 0 ;;
     *) dialog --msgbox "Invalid option." 6 30 ;;
   esac
 done
