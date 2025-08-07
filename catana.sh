@@ -242,9 +242,8 @@ E) Install Subfinder
 F) Install Feroxbuster
 G) Install Ncat
 H) Install Remmina
-I) Install FreeRDP
-J) Setup BloodHound
-K) Install Enum4linux
+I) Setup BloodHound
+J) Install Enum4linux
 Q) Quit
 MENU
   read -rp "Enter choice: " choice
@@ -265,9 +264,8 @@ MENU
     [Ff]) install_feroxbuster ;;
     [Gg]) install_ncat ;;
     [Hh]) install_remmina ;;
-    [Ii]) install_xfreerdp ;;
-    [Jj]) install_bloodhound ;;
-    [Kk]) install_enum4linux ;;
+    [Ii]) install_bloodhound ;;
+    [Jj]) install_enum4linux ;;
     [Qq]) echo "Goodbye!"; exit 0 ;;
     *) echo "Invalid choice."; sleep 1 ;;
   esac
