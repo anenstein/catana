@@ -222,13 +222,13 @@ while true; do
   # Header
   echo -e "${BLUE}"
   cat << 'ASCII'
-           _                    
-          | |                   
-  ___ __ _| |_ __ _ _ __   __ _ 
- / __/ _` | __/ _` | '_ \ / _` |
-| (_| (_| | || (_| | | | | (_| |
- \___\__,_|\__\__,_|_| |_|\__,_|
-         @anenstein             
+             _                    
+            | |                   
+    ___ __ _| |_ __ _ _ __   __ _ 
+   / __/ _` | __/ _` | '_ \ / _` |
+  | (_| (_| | || (_| | | | | (_| |
+   \___\__,_|\__\__,_|_| |_|\__,_|
+           @anenstein             
 ASCII
   echo -e "${NC}"
 
@@ -258,7 +258,7 @@ ASCII
     Q) Quit
 MENU
   echo -e "${NC}"
-  read -rp "Enter choice:" choice
+  read -rp "Enter choice: " choice
   echo "You entered: $choice"
   case "$choice" in
     1) update_system ;;
