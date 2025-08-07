@@ -236,6 +236,7 @@ ASCII
   # Menu
   echo -e "${BLUE}"
   cat << 'MENU'
+        MENU
 --------------------
 1) Update package list
 2) Upgrade installed packages
