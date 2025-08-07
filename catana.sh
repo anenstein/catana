@@ -143,19 +143,30 @@ fix_samba() {
 # 5) Fix Golang env
 fix_golang_env() {
   echo -e "\n${BLUE}==> Fixing Golang environment${NC}"
+
+  local did_install=0
+
   check_and_install go Golang apt install -y golang
+  [[ $? -eq 0 ]] && did_install=1
+
   if ! grep -q "export GOPATH" ~/.bashrc; then
     echo "export GOPATH=\$HOME/go" >> ~/.bashrc
     echo -e "\n${GREEN}==> GOPATH added to ~/.bashrc${NC}"
   else
     echo -e "\n${YELLOW}==> GOPATH already configured.${NC}"
   fi
-  handle_restarts
+
+  if [[ $did_install -eq 1 ]]; then
+    handle_restarts
+  fi
 }
 
 # 6) Install Impacket
 install_impacket() {
   echo -e "\n${BLUE}==> Installing Impacket${NC}"
+
+  local did_install=0
+
   if python3 - << 'PYCODE' &> /dev/null; then
 import impacket
 PYCODE
@@ -164,16 +175,29 @@ PYCODE
     ensure_venv
     run "Installing Impacket in venv" bash -c \
       "source '$VENV_DIR/bin/activate' && pip install --upgrade impacket"
+    did_install=1
   fi
-  handle_restarts
+
+  if [[ $did_install -eq 1 ]]; then
+    handle_restarts
+  fi
 }
 
 # 7) Fix Docker/Compose
 fix_docker_compose() {
   echo -e "\n${BLUE}==> Ensuring Docker & Compose${NC}"
+
+  local did_install=0
+
   check_and_install docker Docker apt install -y docker.io
+  [[ $? -eq 0 ]] && did_install=1
+
   check_and_install docker-compose Docker-Compose apt install -y docker-compose
-  handle_restarts
+  [[ $? -eq 0 ]] && did_install=1
+
+  if [[ $did_install -eq 1 ]]; then
+    handle_restarts
+  fi
 }
 
 # 8) Update Nmap scripts
@@ -185,8 +209,14 @@ fix_nmap_scripts() {
 # Extra tools (check_and_install)
 install_proxychains()   { check_and_install proxychains4 Proxychains apt install -y proxychains4; }
 install_filezilla() {
+  local did_install=0
+
   check_and_install filezilla FileZilla apt install -y filezilla
-  handle_restarts
+  [[ $? -eq 0 ]] && did_install=1
+
+  if [[ $did_install -eq 1 ]]; then
+    handle_restarts
+  fi
 }
 install_rlwrap()        { check_and_install rlwrap rlwrap apt install -y rlwrap; }
 install_nuclei()        { check_and_install nuclei Nuclei apt install -y nuclei; }
@@ -194,8 +224,14 @@ install_subfinder()     { check_and_install subfinder Subfinder apt install -y s
 install_feroxbuster()   { check_and_install feroxbuster Feroxbuster apt install -y feroxbuster; }
 install_ncat()          { check_and_install ncat Ncat apt install -y ncat; }
 install_remmina() {
+  local did_install=0
+
   check_and_install remmina Remmina apt install -y remmina
-  handle_restarts
+  [[ $? -eq 0 ]] && did_install=1
+
+  if [[ $did_install -eq 1 ]]; then
+    handle_restarts
+  fi
 }
 # Setup BloodHound
 install_bloodhound() {
