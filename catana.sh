@@ -191,12 +191,11 @@ install_remmina() {
 }
 # Setup BloodHound
 install_bloodhound() {
-  echo -e "\n==> Setting up BloodHound via Docker Compose in tmux session"
+  echo -e "\n==> Launching BloodHound in a new visible tmux session"
   if command -v tmux &>/dev/null; then
-    tmux new-session -d -s bloodhound 'sudo docker compose up'
-    echo "==> BloodHound running in tmux session: 'bloodhound'"
+    tmux new-session -s bloodhound 'sudo docker compose up'
   else
-    echo "ERROR: tmux not installed. Install it or use nohup fallback."
+    echo "ERROR: tmux is not installed. Install it or use nohup instead."
   fi
 }
 
