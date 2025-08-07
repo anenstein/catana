@@ -9,12 +9,17 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# Self-install into /usr/local/bin/catana if needed
-if [[ "$(basename "$0")" != "catana" ]]; then
-  echo "Installing Catana to /usr/local/bin/catana..."
-  cp "$0" /usr/local/bin/catana
-  chmod +x /usr/local/bin/catana
-  exec /usr/local/bin/catana "$@"
+# Path to installed version
+TARGET_BIN="/usr/local/bin/catana"
+
+# If running as a script, ensure latest version is installed
+if [[ "$(realpath "$0")" != "$TARGET_BIN" ]]; then
+  if ! cmp -s "$0" "$TARGET_BIN"; then
+    echo "Updating installed Catana to latest version..."
+    cp "$0" "$TARGET_BIN"
+    chmod +x "$TARGET_BIN"
+  fi
+  exec "$TARGET_BIN" "$@"
 fi
 
 # Utility: run a command with a description and show completion status
