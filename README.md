@@ -45,12 +45,12 @@ sudo bash ./catana.sh
 sudo catana
 ```
 ---
-#### - To pull in updates and reinstall system-wide:
+#### To pull in updates and reinstall system-wide:
 ```bash
 cd catana
 git pull https://github.com/anenstein/catana.git
 ```
-#### - Re-run the installer script to update /usr/local/bin/catana:
+#### Re-run the installer script to update /usr/local/bin/catana:
 ```bash
 sudo ./catana.sh
 ```
