@@ -40,7 +40,7 @@ cd catana
 ```bash
 sudo bash ./catana.sh
 ```
-### 3. From now on you can run Catana directly
+### 3. From now on you can run catana directly
 ```bash
 sudo catana
 ```
