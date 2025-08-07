@@ -191,10 +191,13 @@ install_remmina() {
 }
 # Setup BloodHound
 install_bloodhound() {
-  echo -e "
-==> Setting up BloodHound via Docker Compose"
-  sudo docker compose up
-    echo "BloodHound containers launched via docker-compose."
+  echo -e "\n==> Setting up BloodHound via Docker Compose in tmux session"
+  if command -v tmux &>/dev/null; then
+    tmux new-session -d -s bloodhound 'sudo docker compose up'
+    echo "==> BloodHound running in tmux session: 'bloodhound'"
+  else
+    echo "ERROR: tmux not installed. Install it or use nohup fallback."
+  fi
 }
 
 install_enum4linux()    { check_and_install enum4linux Enum4linux apt install -y enum4linux; }
