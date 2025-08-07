@@ -191,12 +191,21 @@ install_remmina() {
 }
 # Setup BloodHound
 install_bloodhound() {
-  echo -e "\n==> Launching BloodHound in a new visible tmux session"
-  if command -v tmux &>/dev/null; then
-    tmux new-session -s bloodhound 'sudo docker compose up'
-  else
-    echo "ERROR: tmux is not installed. Install it or use nohup instead."
+  echo -e "\n==> Launching BloodHound in a new tmux session"
+
+  if ! command -v tmux &>/dev/null; then
+    echo "ERROR: tmux is not installed. Please install it with: sudo apt install tmux"
+    return 1
   fi
+
+  # If a session named 'bloodhound' already exists, kill it to avoid conflict
+  if tmux has-session -t bloodhound 2>/dev/null; then
+    echo "==> Killing existing 'bloodhound' tmux session"
+    tmux kill-session -t bloodhound
+  fi
+
+  # Start a new session and attach immediately
+  tmux new-session -s bloodhound 'sudo docker compose up'
 }
 
 install_enum4linux()    { check_and_install enum4linux Enum4linux apt install -y enum4linux; }
