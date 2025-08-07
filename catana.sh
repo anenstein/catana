@@ -64,7 +64,7 @@ update_system() {
 upgrade_system() {
   run "Upgrading installed packages" apt upgrade -y
   handle_restarts
-  read -rp $'\n'"${YELLOW}System upgrade complete. Reboot now? [y/N]: ${NC}" reboot_choice
+  read -rp $'\n'"System upgrade complete. Reboot now? [y/N]:" reboot_choice
   if [[ "$reboot_choice" =~ ^[Yy]$ ]]; then
     echo -e "${BLUE}Rebooting...${NC}"
     reboot
