@@ -45,7 +45,7 @@ sudo catana
 cd catana
 git pull https://github.com/anenstein/catana.git
 ```
-###    Re-run the installer script to update /usr/local/bin/catana
+### 5. Re-run the installer script to update /usr/local/bin/catana
 ```bash
 sudo ./catana.sh
 ```
