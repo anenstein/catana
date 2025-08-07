@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
-# Auto-install: place in PATH as 'catana' for direct invocation
+# catana: Infrastructure Red Team Bootstrapper for Kali Linux
+# ----------------------------------------------------------
+# Dependencies: dialog is required for the interactive menu.
+# This script updates/upgrades the OS, installs dialog if missing,
+# then self-installs itself into /usr/local/bin/catana, sets an alias,
+# and launches the menu.
+
+# Ensure we're root
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root or via sudo."
+  exit 1
+fi
+
+# Install 'dialog' if missing
+if ! command -v dialog &> /dev/null; then
+  echo "Installing 'dialog' dependency..."
+  apt update -y && apt install -y dialog
+fi
+
+# Self-install into /usr/local/bin/catana
 if [[ "$(basename "$0")" != "catana" ]]; then
   echo "Installing Catana to /usr/local/bin/catana..."
   cp "$0" /usr/local/bin/catana
@@ -7,20 +26,14 @@ if [[ "$(basename "$0")" != "catana" ]]; then
   exec /usr/local/bin/catana "$@"
 fi
 
-# Auto-alias setup: allows running via 'catana' without exec bit
+# Auto-alias setup
 SCRIPT_PATH="$(realpath "$0")"
 BASHRC="$HOME/.bashrc"
 if ! grep -q "alias catana=" "$BASHRC"; then
   echo "Setting up alias in $BASHRC..."
   echo "alias catana='bash $SCRIPT_PATH'" >> "$BASHRC"
-  # shellcheck disable=SC1090
   source "$BASHRC"
 fi
-# catana: Infrastructure Red Team Bootstrapper for Kali Linux
-# ----------------------------------------------------------
-# This script updates/upgrades the OS, then installs or fixes
-# various tools via an interactive menu. It's idempotent, shows
-# progress, supports a Python virtualenv, and is easy to extend.
 
 #-----------------------------------------
 # ASCII HEADER
@@ -198,44 +211,4 @@ function show_menu() {
     8 "Fix Nmap scripts" \
     9 "Upgrade" \
     A "Install Proxychains" \
-    B "Install Filezilla" \
-    C "Install rlwrap" \
-    D "Install Nuclei" \
-    E "Install Subfinder" \
-    F "Install Feroxbuster" \
-    G "Install Ncat" \
-    H "Install Remmina" \
-    I "Install xfreerdp" \
-    J "Setup BloodHound" \
-    M "Install Enum4linux" \
-    N "Install LinPEAS" \
-    O "Install WinPEAS" \
-    K "Install ALL selected" \
-    X "Quit" 2> /tmp/catana.choice
-  CHOICE=$(< /tmp/catana.choice)
-}
-
-function install_all() {
-  ALL_FUNCS=(fix_missing_tools fix_samba fix_golang_env install_impacket enable_root_login fix_docker_compose fix_nmap_scripts run_upgrade_tools install_proxychains install_filezilla install_rlwrap install_nuclei install_subfinder install_feroxbuster install_ncat install_remmina install_xfreerdp install_bloodhound install_enum4linux install_linpeas install_winpeas)
-  TOTAL_STEPS=${#ALL_FUNCS[@]}
-  CURRENT_STEP=0
-  for f in "${ALL_FUNCS[@]}"; do
-    "$f"
-  done
-  dialog --msgbox "All selected tools have been processed." 8 40
-}
-
-# MAIN LOOP
-while true; do
-  show_menu
-  case "$CHOICE" in
-    1) fix_missing_tools ;; 2) fix_samba ;; 3) fix_golang_env ;; 4) fix_grub_mitigation ;;
-    5) install_impacket ;; 6) enable_root_login ;; 7) fix_docker_compose ;; 8) fix_nmap_scripts ;;
-    9) run_upgrade_tools ;;
-    A) install_proxychains ;; B) install_filezilla ;; C) install_rlwrap ;;
-    D) install_nuclei ;; E) install_subfinder ;; F) install_feroxbuster ;;
-    G) install_ncat ;; H) install_remmina ;; I) install_xfreerdp ;;
-    J) install_bloodhound ;; M) install_enum4linux ;; N) install_linpeas ;; O) install_winpeas ;; K) install_all ;; X) clear; exit 0 ;;
-    *) dialog --msgbox "Invalid option." 6 30 ;;
-  esac
-done
+    B "Install Filezilla" 
