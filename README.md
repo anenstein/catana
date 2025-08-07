@@ -5,13 +5,13 @@ Catana is an interactive Red Team infrastructure bootstrapper for Kali Linux. It
 
 ## Features
 
-- install of essential Red Team tools and environments
+- Installation of essential penetration testing tools and environments
 - Python virtual environment
 - Peass-NG suite installation
-- Decompression of rockyou wordlist
+- Unzipping of rockyou wordlist
 - Docker & Docker Compose setup and fix
 - Tools like Nmap, Go, FileZilla, Proxychains, Remmina, rlwrap, Impacket, Subfinder, and more
-- BloodHound setup in a dedicated `tmux` session
+- BloodHound docker setup in a dedicated `tmux` session
 - Fixes and configurations for Samba and Golang environments
 
 ---
@@ -19,7 +19,7 @@ Catana is an interactive Red Team infrastructure bootstrapper for Kali Linux. It
 ## Screenshot
 
 <p align="center">
-  <img src="assets/catana.png" width="600" alt="Catana main menu" />
+  <img src="assets/catana.png" width="400" alt="Catana main menu" />
 </p>
 
 ---
