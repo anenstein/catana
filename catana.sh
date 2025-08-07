@@ -146,8 +146,12 @@ fix_golang_env() {
 
   local did_install=0
 
-  check_and_install go Golang apt install -y golang
-  [[ $? -eq 0 ]] && did_install=1
+  if ! command -v go &>/dev/null; then
+    check_and_install go Golang apt install -y golang
+    [[ $? -eq 0 ]] && did_install=1
+  else
+    echo -e "${GREEN}==> Golang is already installed.${NC}"
+  fi
 
   if ! grep -q "export GOPATH" ~/.bashrc; then
     echo "export GOPATH=\$HOME/go" >> ~/.bashrc
@@ -163,7 +167,6 @@ fix_golang_env() {
 
 # 6) Install Impacket
 install_impacket() {
-  echo -e "\n${BLUE}==> Installing Impacket${NC}"
 
   local did_install=0
 
@@ -185,7 +188,6 @@ PYCODE
 
 # 7) Fix Docker/Compose
 fix_docker_compose() {
-  echo -e "\n${BLUE}==> Ensuring Docker & Compose${NC}"
 
   local did_install=0
 
@@ -217,7 +219,6 @@ fix_nmap_scripts() {
 # Extra tools (check_and_install)
 install_proxychains()   { check_and_install proxychains4 Proxychains apt install -y proxychains4; }
 install_filezilla() {
-  echo -e "\n${BLUE}==> Installing FileZilla${NC}"
 
   local did_install=0
 
@@ -238,7 +239,6 @@ install_subfinder()     { check_and_install subfinder Subfinder apt install -y s
 install_feroxbuster()   { check_and_install feroxbuster Feroxbuster apt install -y feroxbuster; }
 install_ncat()          { check_and_install ncat Ncat apt install -y ncat; }
 install_remmina() {
-  echo -e "\n${BLUE}==> Installing Remmina${NC}"
 
   local did_install=0
 
