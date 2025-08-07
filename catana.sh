@@ -138,7 +138,7 @@ ASCII
   cat << 'MENU'
 Catana CLI Installer
 --------------------
-1) Fix missing tools
+1) Fix missing tools, update, upgrade
 2) Fix Samba config
 3) Fix Golang env
 4) Fix Grub mitigations
