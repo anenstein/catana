@@ -36,23 +36,28 @@ Catana is an interactive Red Team infrastructure bootstrapper for Kali Linux. It
 ## Installation
 
 ### 1. Clone the repo and change directory
+```bash
 git clone https://github.com/anenstein/catana.git
 cd catana
-
+```
 ### 2. Run the installer for the first time
+```bash
 sudo bash ./catana.sh
-
+```
 ### 3. From now on you can run Catana directly
+```bash
 sudo catana
-
+```
 # ——————————————————————————
 ### 4. To pull in updates and reinstall system-wide:
+```bash
 cd catana
 git pull https://github.com/anenstein/catana.git
-
+```
 ###    Re-run the installer script to update /usr/local/bin/catana
+```bash
 sudo ./catana.sh
-
+```
 ## Disclaimer
 
 Catana is intended for educational and authorized penetration testing use only. Always obtain proper permission before using tools that interact with or scan remote systems.
