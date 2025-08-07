@@ -3,9 +3,16 @@
 # ----------------------------------------------------------
 # Dependencies: standard utilities.
 
+# Color definitions
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
 # Ensure we’re root
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run as root or via sudo."
+  echo -e "${RED}Please run as root or via sudo.${NC}"
   exit 1
 fi
 
@@ -15,7 +22,7 @@ TARGET_BIN="/usr/local/bin/catana"
 # If running as a script, ensure latest version is installed
 if [[ "$(realpath "$0")" != "$TARGET_BIN" ]]; then
   if ! cmp -s "$0" "$TARGET_BIN"; then
-    echo "Updating installed Catana to latest version..."
+    echo -e "${BLUE}Updating installed Catana to latest version...${NC}"
     cp "$0" "$TARGET_BIN"
     chmod +x "$TARGET_BIN"
   fi
@@ -26,14 +33,13 @@ fi
 run() {
   local desc="$1"
   shift
-  echo -e "
-==> $desc"
+  echo -e "\n${BLUE}==> $desc${NC}"
   "$@"
   local rc=$?
   if [ $rc -eq 0 ]; then
-    echo "==> Completed: $desc"
+    echo -e "${GREEN}==> Completed: $desc${NC}"
   else
-    echo "==> FAILED: $desc (exit code $rc)"
+    echo -e "${RED}==> FAILED: $desc (exit code $rc)${NC}"
   fi
   return $rc
 }
@@ -43,8 +49,7 @@ check_and_install() {
   local name="$1" desc="$2"
   shift 2
   if command -v "$name" &> /dev/null; then
-    echo -e "
-==> Skipping $desc (already installed)"
+    echo -e "\n${YELLOW}==> Skipping $desc (already installed)${NC}"
   else
     run "Installing $desc" "$@"
   fi
@@ -59,34 +64,34 @@ update_system() {
 upgrade_system() {
   run "Upgrading installed packages" apt upgrade -y
   handle_restarts
-  read -rp $'\nSystem upgrade complete. Reboot now? [y/N]: ' reboot_choice
+  read -rp $'\n'"${YELLOW}System upgrade complete. Reboot now? [y/N]: ${NC}" reboot_choice
   if [[ "$reboot_choice" =~ ^[Yy]$ ]]; then
-    echo "Rebooting..."
+    echo -e "${BLUE}Rebooting...${NC}"
     reboot
   fi
 }
 # Detect and handle service/library restarts
 handle_restarts() {
   if ! command -v needrestart &> /dev/null; then
-    echo -e "\n==> Installing needrestart to manage restarts"
+    echo -e "\n${BLUE}==> Installing needrestart to manage restarts${NC}"
     apt install -y needrestart
   fi
 
   echo "\$nrconf{restart} = 'a';" > /etc/needrestart/conf.d/catana.conf
   echo "\$nrconf{restart_notify} = 0;" >> /etc/needrestart/conf.d/catana.conf
 
-  echo -e "\n==> Checking for services or libraries to restart"
+  echo -e "\n${BLUE}==> Checking for services or libraries to restart${NC}"
   needrestart -q -r a
   if [ $? -ne 0 ]; then
-    echo -e "\n==> Some updates require a full reboot. Please reboot when convenient." >&2
+    echo -e "\n${RED}==> Some updates require a full reboot. Please reboot when convenient.${NC}" >&2
   else
-    echo -e "\n==> All services have been restarted successfully."
+    echo -e "\n${GREEN}==> All services have been restarted successfully.${NC}"
   fi
 }
 
 # 3) Install base red-team tools & env
 install_base_tools() {
-  echo -e "\n==> Installing base red-team tools & environment"
+  echo -e "\n${BLUE}==> Installing base red-team tools & environment${NC}"
   check_and_install gedit Gedit apt install -y gedit
   check_and_install nmap Nmap apt install -y nmap
   check_and_install gcc build-essential apt install -y build-essential
@@ -100,61 +105,61 @@ install_base_tools() {
 # VENV, rockyou, PEASS suite
 VENV_DIR="$HOME/.catana_venv"
 ensure_venv() {
-  echo -e "\n==> Setting up Python venv"
+  echo -e "\n${BLUE}==> Setting up Python venv${NC}"
   check_and_install python3 Python3 apt install -y python3
   check_and_install python3 python3-venv apt install -y python3-venv
   if [ ! -d "$VENV_DIR" ]; then
     run "Creating Python virtualenv" python3 -m venv "$VENV_DIR"
     run "Upgrading pip in venv" bash -c "source '$VENV_DIR/bin/activate' && pip install --upgrade pip"
   else
-    echo -e "\n==> Virtualenv already exists, skipping."
+    echo -e "\n${YELLOW}==> Virtualenv already exists, skipping.${NC}"
   fi
 }
 ensure_rockyou() {
-  echo -e "\n==> Ensuring rockyou wordlist"
+  echo -e "\n${BLUE}==> Ensuring rockyou wordlist${NC}"
   local LISTDIR="/usr/share/wordlists"
   if [ -f "$LISTDIR/rockyou.txt.gz" ] && [ ! -f "$LISTDIR/rockyou.txt" ]; then
     run "Unzipping rockyou wordlist" gunzip -k "$LISTDIR/rockyou.txt.gz"
   else
-    echo -e "\n==> rockyou wordlist already available."
+    echo -e "\n${YELLOW}==> rockyou wordlist already available.${NC}"
   fi
 }
 install_peass() {
-  echo -e "\n==> Installing PEASS-ng suite"
+  echo -e "\n${BLUE}==> Installing PEASS-ng suite${NC}"
   if [ ! -d "/opt/PEASS-ng" ]; then
     run "Cloning PEASS-ng suite" git clone https://github.com/carlospolop/PEASS-ng.git /opt/PEASS-ng
   else
-    echo -e "\n==> PEASS-ng suite already present."
+    echo -e "\n${YELLOW}==> PEASS-ng suite already present.${NC}"
   fi
 }
 
 # 4) Fix Samba config
 fix_samba() {
-  echo -e "\n==> Fixing Samba configuration"
+  echo -e "\n${BLUE}==> Fixing Samba configuration${NC}"
   run "Configuring Samba protocols" bash -c \
     "grep -q 'client min protocol' /etc/samba/smb.conf || echo -e '\tclient min protocol = SMB2\n\tclient max protocol = SMB3' >> /etc/samba/smb.conf"
 }
 
 # 5) Fix Golang env
 fix_golang_env() {
-  echo -e "\n==> Fixing Golang environment"
+  echo -e "\n${BLUE}==> Fixing Golang environment${NC}"
   check_and_install go Golang apt install -y golang
   if ! grep -q "export GOPATH" ~/.bashrc; then
     echo "export GOPATH=\$HOME/go" >> ~/.bashrc
-    echo -e "\n==> GOPATH added to ~/.bashrc"
+    echo -e "\n${GREEN}==> GOPATH added to ~/.bashrc${NC}"
   else
-    echo -e "\n==> GOPATH already configured."
+    echo -e "\n${YELLOW}==> GOPATH already configured.${NC}"
   fi
   handle_restarts
 }
 
 # 6) Install Impacket
 install_impacket() {
-  echo -e "\n==> Installing Impacket"
+  echo -e "\n${BLUE}==> Installing Impacket${NC}"
   if python3 - << 'PYCODE' &> /dev/null; then
 import impacket
 PYCODE
-    echo -e "\n==> Impacket found system-wide."
+    echo -e "\n${GREEN}==> Impacket found system-wide.${NC}"
   else
     ensure_venv
     run "Installing Impacket in venv" bash -c \
@@ -165,7 +170,7 @@ PYCODE
 
 # 7) Fix Docker/Compose
 fix_docker_compose() {
-  echo -e "\n==> Ensuring Docker & Compose"
+  echo -e "\n${BLUE}==> Ensuring Docker & Compose${NC}"
   check_and_install docker Docker apt install -y docker.io
   check_and_install docker-compose Docker-Compose apt install -y docker-compose
   handle_restarts
@@ -173,7 +178,7 @@ fix_docker_compose() {
 
 # 8) Update Nmap scripts
 fix_nmap_scripts() {
-  echo -e "\n==> Updating Nmap scripts DB"
+  echo -e "\n${BLUE}==> Updating Nmap scripts DB${NC}"
   run "Updating Nmap scripts DB" nmap --script-updatedb
 }
 
@@ -184,9 +189,7 @@ install_filezilla() {
   handle_restarts
 }
 install_rlwrap()        { check_and_install rlwrap rlwrap apt install -y rlwrap; }
-# Install Nuclei
 install_nuclei()        { check_and_install nuclei Nuclei apt install -y nuclei; }
-# Install Subfinder
 install_subfinder()     { check_and_install subfinder Subfinder apt install -y subfinder; }
 install_feroxbuster()   { check_and_install feroxbuster Feroxbuster apt install -y feroxbuster; }
 install_ncat()          { check_and_install ncat Ncat apt install -y ncat; }
@@ -196,20 +199,18 @@ install_remmina() {
 }
 # Setup BloodHound
 install_bloodhound() {
-  echo -e "\n==> Launching BloodHound in a new tmux session"
+  echo -e "\n${BLUE}==> Launching BloodHound in a new tmux session${NC}"
 
   if ! command -v tmux &>/dev/null; then
-    echo "ERROR: tmux is not installed. Please install it with: sudo apt install tmux"
+    echo -e "${RED}ERROR: tmux is not installed. Please install it with: sudo apt install tmux${NC}"
     return 1
   fi
 
-  # If a session named 'bloodhound' already exists, kill it to avoid conflict
   if tmux has-session -t bloodhound 2>/dev/null; then
-    echo "==> Killing existing 'bloodhound' tmux session"
+    echo -e "${YELLOW}==> Killing existing 'bloodhound' tmux session${NC}"
     tmux kill-session -t bloodhound
   fi
 
-  # Start a new session and attach immediately
   tmux new-session -s bloodhound 'sudo docker compose up'
 }
 
@@ -218,6 +219,8 @@ install_enum4linux()    { check_and_install enum4linux Enum4linux apt install -y
 # Main menu loop with ASCII header
 while true; do
   clear
+  # Header
+  echo -e "${BLUE}"
   cat << 'ASCII'
            _                    
           | |                   
@@ -228,7 +231,10 @@ while true; do
          @anenstein
                                 
 ASCII
-  echo
+  echo -e "${NC}"
+
+  # Menu
+  echo -e "${BLUE}"
   cat << 'MENU'
 --------------------
 1) Update package list
@@ -251,7 +257,8 @@ I) Setup BloodHound
 J) Install Enum4linux
 Q) Quit
 MENU
-  read -rp "Enter choice: " choice
+  echo -e "${NC}"
+  read -rp "${BLUE}Enter choice: ${NC}" choice
   case "$choice" in
     1) update_system ;;
     2) upgrade_system ;;
@@ -271,9 +278,9 @@ MENU
     [Hh]) install_remmina ;;
     [Ii]) install_bloodhound ;;
     [Jj]) install_enum4linux ;;
-    [Qq]) echo "Goodbye!"; exit 0 ;;
-    *) echo "Invalid choice."; sleep 1 ;;
+    [Qq]) echo -e "${GREEN}Goodbye!${NC}"; exit 0 ;;
+    *) echo -e "${RED}Invalid choice.${NC}"; sleep 1 ;;
   esac
   # Pause so user can read output before menu refresh
-  read -rp "Press Enter to return to menu..." dummy
+  read -rp "${YELLOW}Press Enter to return to menu...${NC}" dummy
 done
