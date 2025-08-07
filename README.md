@@ -50,7 +50,7 @@ sudo catana
 cd catana
 git pull https://github.com/anenstein/catana.git
 ```
-#### Re-run the installer script to update /usr/local/bin/catana:
+##### Re-run the installer script to update /usr/local/bin/catana:
 ```bash
 sudo ./catana.sh
 ```
