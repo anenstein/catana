@@ -223,8 +223,8 @@ ASCII
 4) Fix Samba config
 5) Fix Golang env
 6) Install Impacket
-8) Install Docker/Compose
-9) Update Nmap scripts
+7) Install Docker/Compose
+8) Update Nmap scripts
 A) Install Proxychains
 B) Install FileZilla
 C) Install rlwrap
