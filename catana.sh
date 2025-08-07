@@ -158,7 +158,7 @@ PYCODE
 enable_root_login() {
   echo -e "\n==> Enabling SSH root login"
   run "Enabling SSH root login" bash -c \
-    "sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl restart sshd"
+    "sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && (systemctl restart sshd || systemctl restart ssh)"
 }
 
 # 8) Fix Docker/Compose
@@ -172,12 +172,6 @@ fix_docker_compose() {
 fix_nmap_scripts() {
   echo -e "\n==> Updating Nmap scripts DB"
   run "Updating Nmap scripts DB" nmap --script-updatedb
-}
-
-# A) Fix Grub mitigations
-fix_grub_mitigation() {
-  echo -e "\n==> Fixing Grub mitigations"
-  run "Disabling grub mitigations" grubby --update-kernel=ALL --remove-args=mitigations=off || true
 }
 
 # Extra tools (check_and_install)
@@ -215,8 +209,6 @@ install_bloodhound() {
 }
 
 install_enum4linux()    { check_and_install enum4linux Enum4linux apt install -y enum4linux; }
-install_linpeas()       { install_peass; check_and_install linpeas LinPEAS ln -sf /opt/PEASS-ng/linpeas/linpeas.sh /usr/local/bin/linpeas; }
-install_winpeas()       { install_peass; check_and_install winpeas WinPEAS ln -sf /opt/PEASS-ng/winPEAS/bin/winPEASexe.exe /usr/local/bin/winpeas; }
 
 # Main menu loop with ASCII header
 while true; do
@@ -240,22 +232,19 @@ ASCII
 5) Fix Golang env
 6) Install Impacket
 7) Enable Root Login
-8) Fix Docker/Compose
+8) Install Docker/Compose
 9) Update Nmap scripts
-A) Fix Grub mitigations
-B) Install Proxychains
-C) Install FileZilla
-D) Install rlwrap
-E) Install Nuclei
-F) Install Subfinder
-G) Install Feroxbuster
-H) Install Ncat
-I) Install Remmina
-J) Install FreeRDP
-K) Setup BloodHound
-L) Install Enum4linux
-M) Install LinPEAS
-N) Install WinPEAS
+A) Install Proxychains
+B) Install FileZilla
+C) Install rlwrap
+D) Install Nuclei
+E) Install Subfinder
+F) Install Feroxbuster
+G) Install Ncat
+H) Install Remmina
+I) Install FreeRDP
+J) Setup BloodHound
+K) Install Enum4linux
 Q) Quit
 MENU
   read -rp "Enter choice: " choice
@@ -269,20 +258,17 @@ MENU
     7) enable_root_login ;;
     8) fix_docker_compose ;;
     9) fix_nmap_scripts ;;
-    [Aa]) fix_grub_mitigation ;;
-    [Bb]) install_proxychains ;;
-    [Cc]) install_filezilla ;;
-    [Dd]) install_rlwrap ;;
-    [Ee]) install_nuclei ;;
-    [Ff]) install_subfinder ;;
-    [Gg]) install_feroxbuster ;;
-    [Hh]) install_ncat ;;
-    [Ii]) install_remmina ;;
-    [Jj]) install_xfreerdp ;;
-    [Kk]) install_bloodhound ;;
-    [Ll]) install_enum4linux ;;
-    [Mm]) install_linpeas ;;
-    [Nn]) install_winpeas ;;
+    [Aa]) install_proxychains ;;
+    [Bb]) install_filezilla ;;
+    [Cc]) install_rlwrap ;;
+    [Dd]) install_nuclei ;;
+    [Ee]) install_subfinder ;;
+    [Ff]) install_feroxbuster ;;
+    [Gg]) install_ncat ;;
+    [Hh]) install_remmina ;;
+    [Ii]) install_xfreerdp ;;
+    [Jj]) install_bloodhound ;;
+    [Kk]) install_enum4linux ;;
     [Qq]) echo "Goodbye!"; exit 0 ;;
     *) echo "Invalid choice."; sleep 1 ;;
   esac
