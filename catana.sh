@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# catana: Infrastructure Red Team Bootstrapper for Kali Linux
+# catana: CLI-only Infrastructure Red Team Bootstrapper for Kali Linux
 # ----------------------------------------------------------
 # Dependencies: standard utilities.
+# Provides a simple text menu with ASCII header and plain text progress or skip messages.
 
 # Ensure we’re root
 if [ "$EUID" -ne 0 ]; then
@@ -58,7 +59,6 @@ upgrade_system() {
 
 # Detect and handle service/library restarts
 handle_restarts() {
-  # Install needrestart if available
   if ! command -v needrestart &> /dev/null; then
     echo -e "
 ==> Installing needrestart to manage restarts"
@@ -66,7 +66,6 @@ handle_restarts() {
   fi
   echo -e "
 ==> Checking for services or libraries to restart"
-  # Automatically restart services and suggest reboot if kernel or core libs changed
   needrestart -q -r a
   if [ $? -ne 0 ]; then
     echo -e "
@@ -79,7 +78,8 @@ handle_restarts() {
 
 # 3) Install base red-team tools & env
 install_base_tools() {
-  echo -e "\n==> Installing base red-team tools & environment"
+  echo -e "
+==> Installing base red-team tools & environment"
   check_and_install gedit Gedit apt install -y gedit
   check_and_install nmap Nmap apt install -y nmap
   check_and_install gcc build-essential apt install -y build-essential
@@ -90,63 +90,74 @@ install_base_tools() {
   install_peass
 }
 
-# VENV, rockyou, PEASS suite
-VENV_DIR="$HOME/.catana_venv"
+# VENV, rockyou, PEASS suite\ nVENV_DIR="$HOME/.catana_venv"
 ensure_venv() {
-  echo -e "\n==> Setting up Python venv"
+  echo -e "
+==> Setting up Python venv"
   check_and_install python3 Python3 apt install -y python3
   check_and_install python3 python3-venv apt install -y python3-venv
   if [ ! -d "$VENV_DIR" ]; then
     run "Creating Python virtualenv" python3 -m venv "$VENV_DIR"
     run "Upgrading pip in venv" bash -c "source '$VENV_DIR/bin/activate' && pip install --upgrade pip"
   else
-    echo -e "\n==> Virtualenv already exists, skipping."
+    echo -e "
+==> Virtualenv already exists, skipping."
   fi
 }
 ensure_rockyou() {
-  echo -e "\n==> Ensuring rockyou wordlist"
+  echo -e "
+==> Ensuring rockyou wordlist"
   local LISTDIR="/usr/share/wordlists"
   if [ -f "$LISTDIR/rockyou.txt.gz" ] && [ ! -f "$LISTDIR/rockyou.txt" ]; then
     run "Unzipping rockyou wordlist" gunzip -k "$LISTDIR/rockyou.txt.gz"
   else
-    echo -e "\n==> rockyou wordlist already available."
+    echo -e "
+==> rockyou wordlist already available."
   fi
 }
 install_peass() {
-  echo -e "\n==> Installing PEASS-ng suite"
+  echo -e "
+==> Installing PEASS-ng suite"
   if [ ! -d "/opt/PEASS-ng" ]; then
     run "Cloning PEASS-ng suite" git clone https://github.com/carlospolop/PEASS-ng.git /opt/PEASS-ng
   else
-    echo -e "\n==> PEASS-ng suite already present."
+    echo -e "
+==> PEASS-ng suite already present."
   fi
 }
 
 # 4) Fix Samba config
 fix_samba() {
-  echo -e "\n==> Fixing Samba configuration"
+  echo -e "
+==> Fixing Samba configuration"
   run "Configuring Samba protocols" bash -c \
     "grep -q 'client min protocol' /etc/samba/smb.conf || echo -e '\tclient min protocol = SMB2\n\tclient max protocol = SMB3' >> /etc/samba/smb.conf"
 }
 
 # 5) Fix Golang env
 fix_golang_env() {
-  echo -e "\n==> Fixing Golang environment"
+  echo -e "
+==> Fixing Golang environment"
   check_and_install go Golang apt install -y golang
   if ! grep -q "export GOPATH" ~/.bashrc; then
     echo "export GOPATH=\$HOME/go" >> ~/.bashrc
-    echo -e "\n==> GOPATH added to ~/.bashrc"
+    echo -e "
+==> GOPATH added to ~/.bashrc"
   else
-    echo -e "\n==> GOPATH already configured."
+    echo -e "
+==> GOPATH already configured."
   fi
 }
 
 # 6) Install Impacket
 install_impacket() {
-  echo -e "\n==> Installing Impacket"
-  if python3 - << 'PYCODE' &> /dev/null; then
+  echo -e "
+==> Installing Impacket"
+  if python3 - << 'PYCODE' &> /dev/null; python
 import impacket
 PYCODE
-    echo -e "\n==> Impacket found system-wide."
+    echo -e "
+==> Impacket found system-wide."
   else
     ensure_venv
     run "Installing Impacket in venv" bash -c \
@@ -156,27 +167,31 @@ PYCODE
 
 # 7) Enable Root Login
 enable_root_login() {
-  echo -e "\n==> Enabling SSH root login"
+  echo -e "
+==> Enabling SSH root login"
   run "Enabling SSH root login" bash -c \
-    "sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl restart sshd"
+    "sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && (systemctl restart sshd || systemctl restart ssh)"
 }
 
 # 8) Fix Docker/Compose
 fix_docker_compose() {
-  echo -e "\n==> Ensuring Docker & Compose"
+  echo -e "
+==> Ensuring Docker & Compose"
   check_and_install docker Docker apt install -y docker.io
   check_and_install docker-compose Docker-Compose apt install -y docker-compose
 }
 
 # 9) Update Nmap scripts
 fix_nmap_scripts() {
-  echo -e "\n==> Updating Nmap scripts DB"
+  echo -e "
+==> Updating Nmap scripts DB"
   run "Updating Nmap scripts DB" nmap --script-updatedb
 }
 
 # A) Fix Grub mitigations
 fix_grub_mitigation() {
-  echo -e "\n==> Fixing Grub mitigations"
+  echo -e "
+==> Fixing Grub mitigations"
   run "Disabling grub mitigations" grubby --update-kernel=ALL --remove-args=mitigations=off || true
 }
 
@@ -184,21 +199,17 @@ fix_grub_mitigation() {
 install_proxychains()   { check_and_install proxychains4 Proxychains apt install -y proxychains4; }
 install_filezilla()     { check_and_install filezilla FileZilla apt install -y filezilla; }
 install_rlwrap()        { check_and_install rlwrap rlwrap apt install -y rlwrap; }
-# E) Install Nuclei
 install_nuclei()        { check_and_install nuclei Nuclei apt install -y nuclei; }
-# F) Install Subfinder
 install_subfinder()     { check_and_install subfinder Subfinder apt install -y subfinder; }
 install_feroxbuster()   { check_and_install feroxbuster Feroxbuster apt install -y feroxbuster; }
 install_ncat()          { check_and_install ncat Ncat apt install -y ncat; }
 install_remmina()       { check_and_install remmina Remmina apt install -y remmina; }
 install_xfreerdp()      { check_and_install xfreerdp FreeRDP apt install -y freerdp2-x11; }
-# J) Install FreeRDP above
 # K) Setup BloodHound
 install_bloodhound() {
   echo -e "
 ==> Setting up BloodHound via Docker Compose"
   local REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-  # Find docker-compose file in repo or subdirectories
   local compose_file
   compose_file=$(find "$REPO_DIR" -maxdepth 2 -type f \( -name "docker-compose.yml" -o -name "docker-compose.yml.txt" \) | head -n 1)
   if [ -n "$compose_file" ]; then
@@ -210,13 +221,10 @@ install_bloodhound() {
     popd > /dev/null
     echo "BloodHound containers launched via docker-compose."
   else
-    echo "ERROR: No docker-compose.yml.txt or bloodhound.tar found in repo."
+    echo "ERROR: No docker-compose file found."
   fi
 }
-
-install_enum4linux()    { check_and_install enum4linux Enum4linux apt install -y enum4linux; }
-install_linpeas()       { install_peass; check_and_install linpeas LinPEAS ln -sf /opt/PEASS-ng/linpeas/linpeas.sh /usr/local/bin/linpeas; }
-install_winpeas()       { install_peass; check_and_install winpeas WinPEAS ln -sf /opt/PEASS-ng/winPEAS/bin/winPEASexe.exe /usr/local/bin/winpeas; }
+install_enum4linux()    { check_and_install enum4linux Enum4inux apt install -y enum4linux; }
 
 # Main menu loop with ASCII header
 while true; do
@@ -235,7 +243,7 @@ ASCII
 --------------------
 1) Update package list
 2) Upgrade installed packages
-3) Install base red-team tools & env
+3) Install base tools & env
 4) Fix Samba config
 5) Fix Golang env
 6) Install Impacket
@@ -253,9 +261,7 @@ H) Install Ncat
 I) Install Remmina
 J) Install FreeRDP
 K) Setup BloodHound
-L) Install Enum4linux
-M) Install LinPEAS
-N) Install WinPEAS
+L) Install Enum4inux
 Q) Quit
 MENU
   read -rp "Enter choice: " choice
@@ -281,11 +287,8 @@ MENU
     [Jj]) install_xfreerdp ;;
     [Kk]) install_bloodhound ;;
     [Ll]) install_enum4linux ;;
-    [Mm]) install_linpeas ;;
-    [Nn]) install_winpeas ;;
     [Qq]) echo "Goodbye!"; exit 0 ;;
     *) echo "Invalid choice."; sleep 1 ;;
   esac
-  # Pause so user can read output before menu refresh
   read -rp "Press Enter to return to menu..." dummy
 done
