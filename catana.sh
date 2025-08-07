@@ -259,6 +259,7 @@ Q) Quit
 MENU
   echo -e "${NC}"
   read -rp "${BLUE}Enter choice: ${NC}" choice
+  echo "You entered: $choice"
   case "$choice" in
     1) update_system ;;
     2) upgrade_system ;;
