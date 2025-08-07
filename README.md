@@ -16,7 +16,7 @@ Catana is an interactive Red Team infrastructure bootstrapper for Kali Linux, or
 - BloodHound docker setup in a dedicated `tmux` session
 - Fixes and configurations for Samba and Golang environments
 
-## Screenshot
+## Menu Overview
 
 <p align="center">
   <img src="assets/CatanaMenu.png" width="400" alt="Catana main menu" />
