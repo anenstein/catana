@@ -184,9 +184,6 @@ install_bloodhound() {
 ==> Setting up BloodHound via Docker Compose"
   sudo docker compose up
     echo "BloodHound containers launched via docker-compose."
-  else
-    echo "ERROR: No docker-compose.yml.txt or bloodhound.tar found in repo."
-  fi
 }
 
 install_enum4linux()    { check_and_install enum4linux Enum4linux apt install -y enum4linux; }
