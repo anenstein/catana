@@ -235,27 +235,27 @@ ASCII
   # Menu
   echo -e "${BLUE}"
   cat << 'MENU'
-          MENU
-  --------------------
-  1) Update package list
-  2) Upgrade installed packages
-  3) Install base red-team tools & env
-  4) Fix Samba config
-  5) Fix Golang env
-  6) Install Impacket
-  7) Install Docker/Compose
-  8) Update Nmap scripts
-  A) Install Proxychains
-  B) Install FileZilla
-  C) Install rlwrap
-  D) Install Nuclei
-  E) Install Subfinder
-  F) Install Feroxbuster
-  G) Install Ncat
-  H) Install Remmina
-  I) Setup BloodHound
-  J) Install Enum4linux
-  Q) Quit
+            MENU
+    --------------------
+    1) Update package list
+    2) Upgrade installed packages
+    3) Install base red-team tools & env
+    4) Fix Samba config
+    5) Fix Golang env
+    6) Install Impacket
+    7) Install Docker/Compose
+    8) Update Nmap scripts
+    A) Install Proxychains
+    B) Install FileZilla
+    C) Install rlwrap
+    D) Install Nuclei
+    E) Install Subfinder
+    F) Install Feroxbuster
+    G) Install Ncat
+    H) Install Remmina
+    I) Setup BloodHound
+    J) Install Enum4linux
+    Q) Quit
 MENU
   echo -e "${NC}"
   read -rp "Enter choice:" choice
