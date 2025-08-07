@@ -40,7 +40,6 @@ sudo bash ./catana.sh
 ```bash
 sudo catana
 ```
-# ——————————————————————————
 ### 4. To pull in updates and reinstall system-wide:
 ```bash
 cd catana
