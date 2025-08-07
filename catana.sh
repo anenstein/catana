@@ -258,7 +258,7 @@ J) Install Enum4linux
 Q) Quit
 MENU
   echo -e "${NC}"
-  read -rp "${BLUE}Enter choice: ${NC}" choice
+  read -rp "Enter choice:" choice
   echo "You entered: $choice"
   case "$choice" in
     1) update_system ;;
@@ -283,5 +283,5 @@ MENU
     *) echo -e "${RED}Invalid choice.${NC}"; sleep 1 ;;
   esac
   # Pause so user can read output before menu refresh
-  read -rp "${YELLOW}Press Enter to return to menu...${NC}" dummy
+  read -rp "${YELLOW}Press Enter to return to menu..." dummy
 done
