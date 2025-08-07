@@ -154,21 +154,14 @@ PYCODE
   fi
 }
 
-# 7) Enable Root Login
-enable_root_login() {
-  echo -e "\n==> Enabling SSH root login"
-  run "Enabling SSH root login" bash -c \
-    "sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && (systemctl restart sshd || systemctl restart ssh)"
-}
-
-# 8) Fix Docker/Compose
+# 7) Fix Docker/Compose
 fix_docker_compose() {
   echo -e "\n==> Ensuring Docker & Compose"
   check_and_install docker Docker apt install -y docker.io
   check_and_install docker-compose Docker-Compose apt install -y docker-compose
 }
 
-# 9) Update Nmap scripts
+# 8) Update Nmap scripts
 fix_nmap_scripts() {
   echo -e "\n==> Updating Nmap scripts DB"
   run "Updating Nmap scripts DB" nmap --script-updatedb
@@ -178,30 +171,18 @@ fix_nmap_scripts() {
 install_proxychains()   { check_and_install proxychains4 Proxychains apt install -y proxychains4; }
 install_filezilla()     { check_and_install filezilla FileZilla apt install -y filezilla; }
 install_rlwrap()        { check_and_install rlwrap rlwrap apt install -y rlwrap; }
-# E) Install Nuclei
+# Install Nuclei
 install_nuclei()        { check_and_install nuclei Nuclei apt install -y nuclei; }
-# F) Install Subfinder
+# Install Subfinder
 install_subfinder()     { check_and_install subfinder Subfinder apt install -y subfinder; }
 install_feroxbuster()   { check_and_install feroxbuster Feroxbuster apt install -y feroxbuster; }
 install_ncat()          { check_and_install ncat Ncat apt install -y ncat; }
 install_remmina()       { check_and_install remmina Remmina apt install -y remmina; }
-install_xfreerdp()      { check_and_install xfreerdp FreeRDP apt install -y freerdp2-x11; }
-# J) Install FreeRDP above
-# K) Setup BloodHound
+# Setup BloodHound
 install_bloodhound() {
   echo -e "
 ==> Setting up BloodHound via Docker Compose"
-  local REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-  # Find docker-compose file in repo or subdirectories
-  local compose_file
-  compose_file=$(find "$REPO_DIR" -maxdepth 2 -type f \( -name "docker-compose.yml" -o -name "docker-compose.yml.txt" \) | head -n 1)
-  if [ -n "$compose_file" ]; then
-    local compose_dir
-    compose_dir=$(dirname "$compose_file")
-    echo "Found compose file at $compose_file, launching containers..."
-    pushd "$compose_dir" > /dev/null
-    run "Running docker-compose up -d" docker-compose up -d
-    popd > /dev/null
+  sudo docker compose up
     echo "BloodHound containers launched via docker-compose."
   else
     echo "ERROR: No docker-compose.yml.txt or bloodhound.tar found in repo."
