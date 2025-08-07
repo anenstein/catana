@@ -18,11 +18,20 @@ if [[ "$(basename "$0")" != "catana" ]]; then
   exec /usr/local/bin/catana "$@"
 fi
 
-# Utility: run a command with a description
+# Utility: run a command with a description and show completion status
 run() {
-  echo -e "\n==> $1"
+  local desc="$1"
   shift
+  echo -e "
+==> $desc"
   "$@"
+  local rc=$?
+  if [ $rc -eq 0 ]; then
+    echo "==> Completed: $desc"
+  else
+    echo "==> FAILED: $desc (exit code $rc)"
+  fi
+  return $rc
 }
 
 # Utility: install if missing, else skip
@@ -30,7 +39,8 @@ check_and_install() {
   local name="$1" desc="$2"
   shift 2
   if command -v "$name" &> /dev/null; then
-    echo -e "\n==> Skipping $desc (already installed)"
+    echo -e "
+==> Skipping $desc (already installed)"
   else
     run "Installing $desc" "$@"
   fi
@@ -44,6 +54,28 @@ update_system() {
 # 2) Upgrade installed packages
 upgrade_system() {
   run "Upgrading installed packages" apt upgrade -y
+  handle_restarts
+}
+
+# Detect and handle service/library restarts
+handle_restarts() {
+  # Install needrestart if available
+  if ! command -v needrestart &> /dev/null; then
+    echo -e "
+==> Installing needrestart to manage restarts"
+    apt install -y needrestart
+  fi
+  echo -e "
+==> Checking for services or libraries to restart"
+  # Automatically restart services and suggest reboot if kernel or core libs changed
+  needrestart -q -r a
+  if [ $? -ne 0 ]; then
+    echo -e "
+==> Some updates require a full reboot. Please reboot when convenient." >&2
+  else
+    echo -e "
+==> All services have been restarted successfully."
+  fi
 }
 
 # 3) Install base red-team tools & env
