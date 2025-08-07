@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 # catana: CLI-only Infrastructure Red Team Bootstrapper for Kali Linux
-# ----------------------------------------------------------
-# Dependencies: none beyond standard utilities.
-# Provides a simple text menu with ASCII header and progress bars.
 
 # Ensure we’re root
 if [ "$EUID" -ne 0 ]; then
@@ -16,26 +13,35 @@ if [[ "$(basename "$0")" != "catana" ]]; then
   cp "$0" /usr/local/bin/catana
   chmod +x /usr/local/bin/catana
   exec /usr/local/bin/catana "$@"
-  sudo ln -sf ~/catana/catana.sh /usr/local/bin/catana
 fi
 
-# Utility: run a command with two-stage progress bar via dialog
-run_with_progress() {
+# Spinner utility for inline progress
+run_with_spinner() {
   local desc="$1"; shift
-  (
-    echo "20"; echo "# $desc"
-    "$@" &> /dev/null
-    echo "100"; echo "# Done"
-  ) | dialog --title "Catana Installer" --gauge "" 10 70 0
+  local pid
+  local spinner=('|' '/' '-' '\\')
+  echo -n "$desc... "
+  "$@" & pid=$!
+  while kill -0 "$pid" 2>/dev/null; do
+    for s in "${spinner[@]}"; do
+      printf "\b%s" "$s"
+      sleep 0.1
+    done
+  done
+  wait "$pid"
+  ret=$?
+  echo -e "\bDone"
+  return $ret
 }
 
 # VENV, rockyou, PEASS suite
 VENV_DIR="$HOME/.catana_venv"
 ensure_venv() {
-  run_with_progress "Installing Python3 and venv" apt update && apt install -y python3 python3-venv
+  run_with_spinner "Installing Python3 and venv" apt update
+  run_with_spinner "Installing Python3 venv package" apt install -y python3 python3-venv
   if [ ! -d "$VENV_DIR" ]; then
-    run_with_progress "Creating Python virtualenv" python3 -m venv "$VENV_DIR"
-    run_with_progress "Upgrading pip in venv" bash -c "source '$VENV_DIR/bin/activate' && pip install --upgrade pip"
+    run_with_spinner "Creating Python virtualenv" python3 -m venv "$VENV_DIR"
+    run_with_spinner "Upgrading pip in venv" bash -c "source '$VENV_DIR/bin/activate' && pip install --upgrade pip"
   else
     echo "Virtualenv already exists, skipping."
   fi
@@ -43,14 +49,14 @@ ensure_venv() {
 ensure_rockyou() {
   local LISTDIR="/usr/share/wordlists"
   if [ -f "$LISTDIR/rockyou.txt.gz" ] && [ ! -f "$LISTDIR/rockyou.txt" ]; then
-    run_with_progress "Unzipping rockyou wordlist" gunzip -k "$LISTDIR/rockyou.txt.gz"
+    run_with_spinner "Unzipping rockyou wordlist" gunzip -k "$LISTDIR/rockyou.txt.gz"
   else
     echo "rockyou wordlist already available."
   fi
 }
 install_peass() {
   if [ ! -d "/opt/PEASS-ng" ]; then
-    run_with_progress "Cloning PEASS-ng suite" git clone https://github.com/carlospolop/PEASS-ng.git /opt/PEASS-ng
+    run_with_spinner "Cloning PEASS-ng suite" git clone https://github.com/carlospolop/PEASS-ng.git /opt/PEASS-ng
   else
     echo "PEASS-ng suite already present."
   fi
@@ -58,17 +64,20 @@ install_peass() {
 
 # Fix/install functions
 fix_missing_tools() {
-  run_with_progress "Updating apt" apt update
-  run_with_progress "Upgrading packages" apt upgrade -y
-  run_with_progress "Installing essentials" apt install -y gedit nmap build-essential golang
-  fix_golang_env; ensure_venv; ensure_rockyou; install_peass
+  run_with_spinner "Updating apt" apt update
+  run_with_spinner "Upgrading packages" apt upgrade -y
+  run_with_spinner "Installing essentials" apt install -y gedit nmap build-essential golang
+  fix_golang_env
+  ensure_venv
+  ensure_rockyou
+  install_peass
 }
 fix_samba() {
-  run_with_progress "Configuring Samba protocols" bash -c \
+  run_with_spinner "Configuring Samba protocols" bash -c \
     "grep -q 'client min protocol' /etc/samba/smb.conf || echo -e '\tclient min protocol = SMB2\n\tclient max protocol = SMB3' >> /etc/samba/smb.conf"
 }
 fix_golang_env() {
-  run_with_progress "Installing Golang" apt install -y golang
+  run_with_spinner "Installing Golang" apt install -y golang
   if ! grep -q "export GOPATH" ~/.bashrc; then
     echo "export GOPATH=\$HOME/go" >> ~/.bashrc
     echo "GOPATH added to ~/.bashrc"
@@ -84,50 +93,51 @@ PYCODE
     echo "Impacket found system-wide."
   else
     ensure_venv
-    run_with_progress "Installing Impacket in venv" bash -c \
+    run_with_spinner "Installing Impacket in venv" bash -c \
       "source '$VENV_DIR/bin/activate' && pip install --upgrade impacket"
   fi
 }
 enable_root_login() {
-  run_with_progress "Enabling SSH root login" bash -c \
+  run_with_spinner "Enabling SSH root login" bash -c \
     "sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl restart sshd"
 }
 fix_docker_compose() {
-  run_with_progress "Installing Docker and Compose" apt install -y docker.io docker-compose
+  run_with_spinner "Installing Docker and Compose" apt install -y docker.io docker-compose
 }
 run_upgrade_tools() {
-  run_with_progress "Full upgrade and cleanup" apt full-upgrade -y && apt autoremove -y
+  run_with_spinner "Full upgrade and cleanup" bash -c \
+    "apt full-upgrade -y && apt autoremove -y"
 }
 fix_grub_mitigation() {
-  run_with_progress "Disabling grub mitigations" grubby --update-kernel=ALL --remove-args=mitigations=off || true
+  run_with_spinner "Disabling grub mitigations" grubby --update-kernel=ALL --remove-args=mitigations=off || true
 }
 fix_nmap_scripts() {
-  run_with_progress "Updating Nmap scripts DB" nmap --script-updatedb
+  run_with_spinner "Updating Nmap scripts DB" nmap --script-updatedb
 }
 
 # Extra tools
-install_proxychains()   { run_with_progress "Installing Proxychains" apt install -y proxychains4; }
-install_filezilla()     { run_with_progress "Installing FileZilla" apt install -y filezilla; }
-install_rlwrap()        { run_with_progress "Installing rlwrap" apt install -y rlwrap; }
-install_nuclei()        { run_with_progress "Installing Nuclei" bash -c "go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest"; }
-install_subfinder()     { run_with_progress "Installing Subfinder" bash -c "go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"; }
-install_feroxbuster()   { run_with_progress "Installing Feroxbuster" apt install -y feroxbuster; }
-install_ncat()          { run_with_progress "Installing Ncat" apt install -y ncat; }
-install_remmina()       { run_with_progress "Installing Remmina" apt install -y remmina; }
-install_xfreerdp()      { run_with_progress "Installing FreeRDP" apt install -y freerdp2-x11; }
+install_proxychains()   { run_with_spinner "Installing Proxychains" apt install -y proxychains4; }
+install_filezilla()     { run_with_spinner "Installing FileZilla" apt install -y filezilla; }
+install_rlwrap()        { run_with_spinner "Installing rlwrap" apt install -y rlwrap; }
+install_nuclei()        { run_with_spinner "Installing Nuclei" bash -c "go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest"; }
+install_subfinder()     { run_with_spinner "Installing Subfinder" bash -c "go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"; }
+install_feroxbuster()   { run_with_spinner "Installing Feroxbuster" apt install -y feroxbuster; }
+install_ncat()          { run_with_spinner "Installing Ncat" apt install -y ncat; }
+install_remmina()       { run_with_spinner "Installing Remmina" apt install -y remmina; }
+install_xfreerdp()      { run_with_spinner "Installing FreeRDP" apt install -y freerdp2-x11; }
 install_bloodhound() {
-  run_with_progress "Installing Docker for BloodHound" apt install -y docker.io
-  run_with_progress "Pulling BloodHound image" docker pull bloodhound
-  run_with_progress "Launching BloodHound container" docker run -d --name bloodhound -p 7474:7474 -p 7687:7687 bloodhound
+  run_with_spinner "Installing Docker for BloodHound" apt install -y docker.io
+  run_with_spinner "Pulling BloodHound image" docker pull bloodhound
+  run_with_spinner "Launching BloodHound container" docker run -d --name bloodhound -p 7474:7474 -p 7687:7687 bloodhound
 }
-install_enum4linux()    { run_with_progress "Installing Enum4linux" apt install -y enum4linux; }
-install_linpeas()       { install_peass; run_with_progress "Linking LinPEAS" ln -sf /opt/PEASS-ng/linpeas/linpeas.sh /usr/local/bin/linpeas; }
-install_winpeas()       { install_peass; run_with_progress "Linking WinPEAS" ln -sf /opt/PEASS-ng/winPEAS/bin/winPEASexe.exe /usr/local/bin/winpeas; }
+install_enum4linux()    { run_with_spinner "Installing Enum4linux" apt install -y enum4linux; }
+install_linpeas()       { install_peass; run_with_spinner "Linking LinPEAS" ln -sf /opt/PEASS-ng/linpeas/linpeas.sh /usr/local/bin/linpeas; }
+install_winpeas()       { install_peass; run_with_spinner "Linking WinPEAS" ln -sf /opt/PEASS-ng/winPEAS/bin/winPEASexe.exe /usr/local/bin/winpeas; }
 
 # Main menu loop with ASCII header
 while true; do
   clear
-  cat << 'MENU'
+  cat << 'ASCII'
            _                    
           | |                   
   ___ __ _| |_ __ _ _ __   __ _ 
@@ -135,6 +145,10 @@ while true; do
 | (_| (_| | || (_| | | | | (_| |
  \___\__,_|\__\__,_|_| |_|\__,_|
                                 
+ASCII
+  echo
+  cat << 'MENU'
+Catana CLI Installer
 --------------------
 1) Fix missing tools
 2) Fix Samba config
@@ -161,7 +175,7 @@ O) Install WinPEAS
 K) Install ALL
 X) Quit
 MENU
-  read -p $'Enter choice: ' choice
+  read -rp "Enter choice: " choice
   case "$choice" in
     1) fix_missing_tools ;; 2) fix_samba ;; 3) fix_golang_env ;; 4) fix_grub_mitigation ;;
     5) install_impacket ;; 6) enable_root_login ;; 7) fix_docker_compose ;; 8) fix_nmap_scripts ;;
