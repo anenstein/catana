@@ -1,8 +1,6 @@
 # catana
 Catana is an interactive Red Team infrastructure bootstrapper for Kali Linux. It automates the installation and setup of essential offensive security tools, environments and configurations.
 
----
-
 ## Features
 
 - Installation of essential penetration testing tools and environments
@@ -14,15 +12,11 @@ Catana is an interactive Red Team infrastructure bootstrapper for Kali Linux. It
 - BloodHound docker setup in a dedicated `tmux` session
 - Fixes and configurations for Samba and Golang environments
 
----
-
 ## Screenshot
 
 <p align="center">
   <img src="assets/catana.png" width="400" alt="Catana main menu" />
 </p>
-
----
 
 ## Requirements
 
@@ -30,8 +24,6 @@ Catana is an interactive Red Team infrastructure bootstrapper for Kali Linux. It
 - Root privileges (sudo)
 - Internet connection
 - Standard CLI tools: apt, bash, git, etc.
-
----
 
 ## Installation
 
