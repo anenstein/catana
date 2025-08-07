@@ -283,5 +283,6 @@ MENU
     *) echo -e "${RED}Invalid choice.${NC}"; sleep 1 ;;
   esac
   # Pause so user can read output before menu refresh
+  echo " "
   read -rp "Press Enter to return to menu..." dummy
 done
