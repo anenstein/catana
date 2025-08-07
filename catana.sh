@@ -54,26 +54,28 @@ update_system() {
 upgrade_system() {
   run "Upgrading installed packages" apt upgrade -y
   handle_restarts
+  read -rp $'\nSystem upgrade complete. Reboot now? [y/N]: ' reboot_choice
+  if [[ "$reboot_choice" =~ ^[Yy]$ ]]; then
+    echo "Rebooting..."
+    reboot
+  fi
 }
-
 # Detect and handle service/library restarts
 handle_restarts() {
-  # Install needrestart if available
   if ! command -v needrestart &> /dev/null; then
-    echo -e "
-==> Installing needrestart to manage restarts"
+    echo -e "\n==> Installing needrestart to manage restarts"
     apt install -y needrestart
   fi
-  echo -e "
-==> Checking for services or libraries to restart"
-  # Automatically restart services and suggest reboot if kernel or core libs changed
+
+  echo "\$nrconf{restart} = 'a';" > /etc/needrestart/conf.d/catana.conf
+  echo "\$nrconf{restart_notify} = 0;" >> /etc/needrestart/conf.d/catana.conf
+
+  echo -e "\n==> Checking for services or libraries to restart"
   needrestart -q -r a
   if [ $? -ne 0 ]; then
-    echo -e "
-==> Some updates require a full reboot. Please reboot when convenient." >&2
+    echo -e "\n==> Some updates require a full reboot. Please reboot when convenient." >&2
   else
-    echo -e "
-==> All services have been restarted successfully."
+    echo -e "\n==> All services have been restarted successfully."
   fi
 }
 
@@ -138,6 +140,7 @@ fix_golang_env() {
   else
     echo -e "\n==> GOPATH already configured."
   fi
+  handle_restarts
 }
 
 # 6) Install Impacket
@@ -152,6 +155,7 @@ PYCODE
     run "Installing Impacket in venv" bash -c \
       "source '$VENV_DIR/bin/activate' && pip install --upgrade impacket"
   fi
+  handle_restarts
 }
 
 # 7) Fix Docker/Compose
@@ -159,6 +163,7 @@ fix_docker_compose() {
   echo -e "\n==> Ensuring Docker & Compose"
   check_and_install docker Docker apt install -y docker.io
   check_and_install docker-compose Docker-Compose apt install -y docker-compose
+  handle_restarts
 }
 
 # 8) Update Nmap scripts
@@ -169,7 +174,10 @@ fix_nmap_scripts() {
 
 # Extra tools (check_and_install)
 install_proxychains()   { check_and_install proxychains4 Proxychains apt install -y proxychains4; }
-install_filezilla()     { check_and_install filezilla FileZilla apt install -y filezilla; }
+install_filezilla() {
+  check_and_install filezilla FileZilla apt install -y filezilla
+  handle_restarts
+}
 install_rlwrap()        { check_and_install rlwrap rlwrap apt install -y rlwrap; }
 # Install Nuclei
 install_nuclei()        { check_and_install nuclei Nuclei apt install -y nuclei; }
@@ -177,7 +185,10 @@ install_nuclei()        { check_and_install nuclei Nuclei apt install -y nuclei;
 install_subfinder()     { check_and_install subfinder Subfinder apt install -y subfinder; }
 install_feroxbuster()   { check_and_install feroxbuster Feroxbuster apt install -y feroxbuster; }
 install_ncat()          { check_and_install ncat Ncat apt install -y ncat; }
-install_remmina()       { check_and_install remmina Remmina apt install -y remmina; }
+install_remmina() {
+  check_and_install remmina Remmina apt install -y remmina
+  handle_restarts
+}
 # Setup BloodHound
 install_bloodhound() {
   echo -e "
