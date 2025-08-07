@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# catana: CLI-only Infrastructure Red Team Bootstrapper for Kali Linux
+# catana: Infrastructure Red Team Bootstrapper for Kali Linux
 # ----------------------------------------------------------
 # Dependencies: standard utilities.
-# Provides a simple text menu with ASCII header and plain text progress or skip messages.
 
 # Ensure we’re root
 if [ "$EUID" -ne 0 ]; then
@@ -233,7 +232,6 @@ while true; do
 ASCII
   echo
   cat << 'MENU'
-Catana CLI Installer
 --------------------
 1) Update package list
 2) Upgrade installed packages
