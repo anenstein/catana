@@ -189,11 +189,19 @@ fix_docker_compose() {
 
   local did_install=0
 
-  check_and_install docker Docker apt install -y docker.io
-  [[ $? -eq 0 ]] && did_install=1
+  if ! command -v docker &>/dev/null; then
+    check_and_install docker Docker apt install -y docker.io
+    [[ $? -eq 0 ]] && did_install=1
+  else
+    echo -e "${GREEN}==> Docker is already installed.${NC}"
+  fi
 
-  check_and_install docker-compose Docker-Compose apt install -y docker-compose
-  [[ $? -eq 0 ]] && did_install=1
+  if ! command -v docker-compose &>/dev/null; then
+    check_and_install docker-compose Docker-Compose apt install -y docker-compose
+    [[ $? -eq 0 ]] && did_install=1
+  else
+    echo -e "${GREEN}==> Docker Compose is already installed.${NC}"
+  fi
 
   if [[ $did_install -eq 1 ]]; then
     handle_restarts
@@ -209,10 +217,16 @@ fix_nmap_scripts() {
 # Extra tools (check_and_install)
 install_proxychains()   { check_and_install proxychains4 Proxychains apt install -y proxychains4; }
 install_filezilla() {
+  echo -e "\n${BLUE}==> Installing FileZilla${NC}"
+
   local did_install=0
 
-  check_and_install filezilla FileZilla apt install -y filezilla
-  [[ $? -eq 0 ]] && did_install=1
+  if ! command -v filezilla &>/dev/null; then
+    check_and_install filezilla FileZilla apt install -y filezilla
+    [[ $? -eq 0 ]] && did_install=1
+  else
+    echo -e "${GREEN}==> FileZilla is already installed.${NC}"
+  fi
 
   if [[ $did_install -eq 1 ]]; then
     handle_restarts
@@ -224,10 +238,16 @@ install_subfinder()     { check_and_install subfinder Subfinder apt install -y s
 install_feroxbuster()   { check_and_install feroxbuster Feroxbuster apt install -y feroxbuster; }
 install_ncat()          { check_and_install ncat Ncat apt install -y ncat; }
 install_remmina() {
+  echo -e "\n${BLUE}==> Installing Remmina${NC}"
+
   local did_install=0
 
-  check_and_install remmina Remmina apt install -y remmina
-  [[ $? -eq 0 ]] && did_install=1
+  if ! command -v remmina &>/dev/null; then
+    check_and_install remmina Remmina apt install -y remmina
+    [[ $? -eq 0 ]] && did_install=1
+  else
+    echo -e "${GREEN}==> Remmina is already installed.${NC}"
+  fi
 
   if [[ $did_install -eq 1 ]]; then
     handle_restarts
