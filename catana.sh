@@ -309,7 +309,7 @@ install_frontend_sast() {
 ${BLUE}==> Installing Frontend SAST tools${NC}"
   ensure_nodejs
   run "Installing js-beautify" npm install -g js-beautify
-  run "Installing sourcemapper" npm install -g sourcemapper
+  run "Installing sourcemapper" go install github.com/denandz/sourcemapper@latest
 }
 
 # Main menu loop with ASCII header
