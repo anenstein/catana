@@ -329,7 +329,7 @@ ASCII
   echo -e "${NC}"
 
   # Organized multi-column menu
-  echo -e "${YELLOW}          MENU${NC}"
+  echo -e "${YELLOW}              MENU${NC}"
   echo -e "${GREEN} SYSTEM${NC}"
   printf "  %-3s %-28s  %-3s %-28s\n" "1)" "Update package list" "2)" "Upgrade installed packages"
 
