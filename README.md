@@ -7,7 +7,6 @@ Catana is an interactive Red Team infrastructure bootstrapper for Kali Linux, or
 
 ## Features
 
-- Installation of essential penetration testing tools and environments
 - Python virtual environment
 - Peass-NG suite installation
 - Unzipping of rockyou wordlist
