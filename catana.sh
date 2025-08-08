@@ -315,7 +315,6 @@ ASCII
 MENU
   echo -e "${NC}"
   read -rp "Enter choice: " choice
-  echo "You entered: $choice"
   case "$choice" in
     1) update_system ;;
     2) upgrade_system ;;
