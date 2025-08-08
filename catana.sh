@@ -108,6 +108,7 @@ ${BLUE}==> Configuring and installing prerequisites & basic tools${NC}"
   ensure_venv
   ensure_rockyou
   install_peass
+  fix_samba
 }
 
 # VENV, rockyou, PEASS suite
@@ -340,9 +341,8 @@ ASCII
   printf "  %-3s %-28s  %-3s %-28s\n" "1)" "Update package list" "2)" "Upgrade installed packages"
 
   echo -e "${GREEN} RED-TEAM CORE${NC}"
-  printf "  %-3s %-28s  %-3s %-28s\n" "3)" "Install base tools & env" "4)" "Fix Samba config"
-  printf "  %-3s %-28s  %-3s %-28s\n" "5)" "Fix Golang env"            "6)" "Install Impacket"
-  printf "  %-3s %-28s  %-3s %-28s\n" "7)" "Install Docker/Compose"      "8)" "Update Nmap scripts"
+  printf "  %-3s %-28s  %-3s %-28s\n" "3)" "Install base tools & env" "4)" "Install Impacket"
+  printf "  %-3s %-28s  %-3s %-28s\n" "5)" "Install Docker/Compose"   "6)" "Update Nmap scripts"
 
   echo -e "${GREEN} TOOLS${NC}"
   printf "  %-3s %-15s %-3s %-15s %-3s %-15s\n" \
@@ -363,11 +363,9 @@ ASCII
     1) update_system ;;
     2) upgrade_system ;;
     3) install_base_tools ;;
-    4) fix_samba ;;
-    5) fix_golang_env ;;
-    6) install_impacket ;;
-    7) fix_docker_compose ;;
-    8) fix_nmap_scripts ;;
+    4) install_impacket ;;
+    5) fix_docker_compose ;;
+    6) fix_nmap_scripts ;;
     [Aa]) install_proxychains ;;
     [Bb]) install_filezilla ;;
     [Cc]) install_rlwrap ;;
