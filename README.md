@@ -7,13 +7,35 @@ Catana is an interactive Red Team bootstrapper for Kali Linux, originally inspir
 
 ## Features
 
-- Python virtual environment
-- Peass-NG suite installation
-- Unzipping of rockyou wordlist
-- Docker & Docker Compose setup and fix
-- Tools like Nmap, Go, FileZilla, Proxychains, Remmina, rlwrap, Impacket, Subfinder, and more
-- BloodHound docker setup in a dedicated `tmux` session
-- Fixes and configurations for Samba and Golang environments
+**System Setup & Configuration**
+- Full system update and upgrade support with reboot prompts
+- Automatic handling of service restarts via `needrestart`
+- Fixes and tweaks for Samba and Golang environments
+- Docker & Docker Compose installation and validation
+
+**Environment Bootstrapping**
+- Python 3 virtual environment creation
+- Pip upgrade within venv
+- Auto-unzipping of the `rockyou.txt` wordlist
+- Adds `GOPATH` and Go-based tooling setup
+
+**Core Tools Installation**
+- Common offensive tools:  
+  - `nmap`, `jq`, `gcc`, `gedit`, `proxychains4`, `rlwrap`, `ncat`, `remmina`, `filezilla`
+- Red team essentials:
+  - `impacket` (via pip in venv)
+  - `PEASS-ng` suite (cloned to `/opt/PEASS-ng`)
+  - `BloodHound` backend via Docker in a dedicated `tmux` session
+
+**Recon Tools**
+- `nuclei` for vulnerability scanning
+- `subfinder`, `github-subdomains`, `assetfinder`, `sublist3r`, `dnsx`, `httpx` for subdomain and asset enumeration
+- `feroxbuster` for content discovery
+
+**Frontend Security Tools**
+- Node.js tools such as:
+  - `js-beautify` (via npm)
+  - `sourcemapper` (via Go)
 
 ## Menu Overview
 
