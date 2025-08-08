@@ -245,8 +245,6 @@ install_filezilla() {
 }
 install_rlwrap()        { check_and_install rlwrap rlwrap apt install -y rlwrap; }
 install_nuclei()        { check_and_install nuclei Nuclei apt install -y nuclei; }
-install_subfinder()     { check_and_install subfinder Subfinder apt install -y subfinder; }
-install_feroxbuster()   { check_and_install feroxbuster Feroxbuster apt install -y feroxbuster; }
 install_ncat()          { check_and_install ncat Ncat apt install -y ncat; }
 install_remmina() {
   local did_install=0
@@ -289,18 +287,20 @@ install_recon_tools() {
   echo -e "
 ${BLUE}==> Installing Recon tools${NC}"
   # GitHub Subdomains
-  check_and_install github-subdomains GitHub-Subdomains bash -lc "go install github.com/projectdiscovery/github-subdomains/cmd/github-subdomains@latest"
+  check_and_install github-subdomains GitHub-Subdomains bash -lc "go install github.com/gwen001/github-subdomains@latest"
   # Subfinder
-  check_and_install subfinder Subfinder bash -lc "go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"
+  check_and_install subfinder Subfinder bash -lc "apt install -y subfinder"
   # Assetfinder
   check_and_install assetfinder Assetfinder bash -lc "go install github.com/tomnomnom/assetfinder@latest"
   # Sublist3r (Python)
   ensure_venv
   check_and_install sublist3r Sublist3r bash -lc "source '$VENV_DIR/bin/activate' && pip install sublist3r"
   # DNSx
-  check_and_install dnsx DNSx bash -lc "go install github.com/projectdiscovery/dnsx/cmd/dnsx@latest"
+  check_and_install dnsx DNSx bash -lc "go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest"
   # HTTPX
-  check_and_install httpx HTTPX bash -lc "go install github.com/projectdiscovery/httpx/cmd/httpx@latest"
+  check_and_install httpx HTTPX bash -lc "go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest"
+
+  check_and_install feroxbuster Feroxbuster bash -lc "apt install -y feroxbuster"
 }
 
 # Install Frontend SAST tools (Node.js)
@@ -340,13 +340,13 @@ ASCII
 
   echo -e "${GREEN} TOOLS${NC}"
   printf "  %-3s %-15s %-3s %-15s %-3s %-15s\n" \
-    "A)" "Proxychains4" "B)" "FileZilla"   "C)" "rlwrap"
+    "A)" "Proxychains4"  "B)" "FileZilla"  "C)" "rlwrap"
   printf "  %-3s %-15s %-3s %-15s %-3s %-15s\n" \
-    "D)" "Nuclei"      "E)" "Subfinder"   "F)" "Feroxbuster"
+    "D)" "Nuclei"  "E)" "Ncat"  "F)" "Remmina"  
   printf "  %-3s %-15s %-3s %-15s %-3s %-15s\n" \
-    "G)" "Ncat"        "H)" "Remmina"     "I)" "BloodHound"
+    "G)" "BloodHound"  "H)" "Enum4linux" "I)" "Recon tools"
   printf "  %-3s %-15s %-3s %-15s %-3s %-15s\n" \
-    "J)" "Enum4linux"  "K)" "Recon tools" "L)" "Frontend SAST"
+    "J)" "Frontend SAST"
 
   echo ""
   echo -e "${YELLOW}  Q) Quit${NC}"
@@ -366,14 +366,12 @@ ASCII
     [Bb]) install_filezilla ;;
     [Cc]) install_rlwrap ;;
     [Dd]) install_nuclei ;;
-    [Ee]) install_subfinder ;;
-    [Ff]) install_feroxbuster ;;
-    [Gg]) install_ncat ;;
-    [Hh]) install_remmina ;;
-    [Ii]) install_bloodhound ;;
-    [Jj]) install_enum4linux ;;
-    [Kk]) install_recon_tools ;;
-    [Ll]) install_frontend_sast ;;
+    [Ee]) install_ncat ;;
+    [Ff]) install_remmina ;;
+    [Gg]) install_bloodhound ;;
+    [Hh]) install_enum4linux ;;
+    [Ii]) install_recon_tools ;;
+    [Jj]) install_frontend_sast ;;
     [Qq]) echo -e "${GREEN}Goodbye!${NC}"; exit 0 ;;
     *) echo -e "${RED}Invalid choice.${NC}"; sleep 1 ;;
   esac
