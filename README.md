@@ -9,8 +9,6 @@ Catana is an interactive Red Team bootstrapper for Kali Linux, originally inspir
 
 **System Setup & Configuration**
 - Full system update and upgrade support with reboot prompts
-- Automatic handling of service restarts via `needrestart`
-- Fixes and tweaks for Samba and Golang environments
 - Docker & Docker Compose installation and validation
 
 **Environment Bootstrapping**
