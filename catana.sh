@@ -341,7 +341,7 @@ ASCII
   printf "  %-3s %-28s  %-3s %-28s\n" "1)" "Update package list" "2)" "Upgrade installed packages"
 
   echo -e "${GREEN} RED-TEAM CORE${NC}"
-  printf "  %-3s %-28s  %-3s %-28s\n" "3)" "Install base tools & env" "4)" "Install Impacket"
+  printf "  %-3s %-28s  %-3s %-28s\n" "3)" "Install prereqs & env" "4)" "Install Impacket"
   printf "  %-3s %-28s  %-3s %-28s\n" "5)" "Install Docker/Compose"   "6)" "Update Nmap scripts"
 
   echo -e "${GREEN} TOOLS${NC}"
