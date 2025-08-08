@@ -259,21 +259,27 @@ install_remmina() {
   fi
 }
 install_bloodhound() {
-  echo -e "
-${BLUE}==> Launching BloodHound in a new tmux session${NC}"
+
+  echo -e "\n${BLUE}==> Launching BloodHound in a new tmux session${NC}"
+
   if ! command -v tmux &>/dev/null; then
+
     echo -e "${RED}ERROR: tmux is not installed. Please install it with: sudo apt install tmux${NC}"
+
     return 1
+
   fi
+
   if tmux has-session -t bloodhound 2>/dev/null; then
+
     echo -e "${YELLOW}==> Killing existing 'bloodhound' tmux session${NC}"
+
     tmux kill-session -t bloodhound
+
   fi
   tmux new-session -s bloodhound 'sudo docker compose up'
-}
-install_enum4linux()    { check_and_install enum4linux Enum4linux apt install -y enum4linux; }
 
-# -- New additions -- #
+}
 
 # Ensure Node.js and npm
 ensure_nodejs() {
