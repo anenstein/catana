@@ -18,7 +18,7 @@ Catana is an interactive Red Team bootstrapper for Kali Linux, originally inspir
 - Adds `GOPATH` and Go-based tooling setup
 
 **Core Tools Installation**
-- Common offensive tools:  
+- Common tools:  
   - `nmap`, `jq`, `gcc`, `gedit`, `proxychains4`, `rlwrap`, `ncat`, `remmina`, `filezilla`
 - Red team essentials:
   - `impacket` (via pip in venv)
