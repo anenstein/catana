@@ -43,7 +43,6 @@ Catana is an interactive Red Team bootstrapper for Kali Linux, originally inspir
 
 ## Requirements
 
-- Kali Linux (or compatible Debian-based distro)
 - Root privileges (sudo)
 - Internet connection
 - Standard CLI tools: apt, bash, git, etc.
