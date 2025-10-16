@@ -373,9 +373,8 @@ ASCII
   printf "  %-3s %-15s %-3s %-15s %-3s %-15s\n" \
     "D)" "Nuclei"  "E)" "Ncat"  "F)" "Remmina"  
   printf "  %-3s %-15s %-3s %-15s %-3s %-15s\n" \
-    "G)" "BloodHound"  "H)" "Enum4linux" "I)" "Recon tools"
-  printf "  %-3s %-15s %-3s %-15s %-3s %-15s\n" \
-    "J)" "Frontend SAST"
+    "G)" "BloodHound"  "H)" "Recon tools"  "I)" "Frontend SAST"
+
 
   echo ""
   echo -e "${YELLOW}  Q) Quit${NC}"
