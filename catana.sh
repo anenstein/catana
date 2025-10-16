@@ -286,7 +286,30 @@ install_bloodhound() {
 ensure_nodejs() {
   echo -e "
 ${BLUE}==> Ensuring Node.js and npm${NC}"
-  check_and_install nodejs Node.js apt install -y nodejs npm
+
+  # Prefer checking 'node' then 'nodejs'
+  if command -v node >/dev/null 2>&1; then
+    echo -e "${GREEN}==> node is installed: $(command -v node)${NC}"
+  elif command -v nodejs >/dev/null 2>&1; then
+    echo -e "${GREEN}==> nodejs is installed: $(command -v nodejs)${NC}"
+  else
+    echo -e "${BLUE}==> Installing Node.js (apt)...${NC}"
+    run "Installing Node.js & npm" apt update && apt install -y nodejs npm
+  fi
+
+  # Ensure npm exists too (sometimes missing)
+  if ! command -v npm >/dev/null 2>&1; then
+    echo -e "${YELLOW}==> npm not found, installing npm${NC}"
+    run "Installing npm" apt update && apt install -y npm
+  else
+    echo -e "${GREEN}==> npm already available: $(command -v npm)${NC}"
+  fi
+
+  # final sanity check
+  if ! command -v npm >/dev/null 2>&1; then
+    echo -e "${RED}==> ERROR: npm still missing after attempted install. Consider using NodeSource to install a newer Node.js package.${NC}"
+    return 1
+  fi
 }
 
 # Install Recon tools (requires Go)
