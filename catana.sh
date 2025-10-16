@@ -373,9 +373,8 @@ ASCII
     [Ee]) install_ncat ;;
     [Ff]) install_remmina ;;
     [Gg]) install_bloodhound ;;
-    [Hh]) install_enum4linux ;;
-    [Ii]) install_recon_tools ;;
-    [Jj]) install_frontend_sast ;;
+    [Hh]) install_recon_tools ;;
+    [Ii]) install_frontend_sast ;;
     [Qq]) echo -e "${GREEN}Goodbye!${NC}"; exit 0 ;;
     *) echo -e "${RED}Invalid choice.${NC}"; sleep 1 ;;
   esac
