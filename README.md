@@ -38,7 +38,7 @@ Catana is an interactive Red Team bootstrapper for Kali Linux, originally inspir
 ## Menu Overview
 
 <p align="center">
-  <img src="assets/CatanaMenu1.png" width="600" alt="Catana main menu" />
+  <img src="assets/catanaint.png" width="600" alt="Catana main menu" />
 </p>
 
 ## Requirements
